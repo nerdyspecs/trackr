@@ -1,0 +1,11 @@
+{
+  "Version": 1,
+  "Hash": "3ULBBcD69gLtoP8syUkKIpYgoE5I4pcFEvAvi+tk4BI=",
+  "Source": "trackr-api",
+  "BasePath": "_content/trackr-api",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": []
+}
