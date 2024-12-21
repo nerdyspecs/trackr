@@ -10,5 +10,9 @@ namespace trackr_api.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Customer> Customers { get; set; }
+        public DbSet<Vehicle> Vehicles { get; set; }
+        public DbSet<Job> Jobs { get; set; }
+        public DbSet<JobStatus>JobStatuses { get; set; }
+        public DbSet<JobDetail> JobDetails { get; set; }
     }
 }

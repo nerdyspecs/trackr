@@ -105,8 +105,7 @@ namespace trackr_api.Controllers
                 {
                     return BadRequest("Customer failed to update. Something went wrong");
                 }
-            }
-            
+            } 
         }
     }
 }
