@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using trackr_api.Data;
+using trackr_api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,10 @@ builder.Services.AddControllers();
 // Register DbContext with MySQL connection
 builder.Services.AddDbContext<TrackrDbContext>(options =>
     options.UseMySql(builder.Configuration.GetConnectionString("DefaultConnection"), new MySqlServerVersion(new Version(8, 0, 10))));
+
+
+builder.Services.AddScoped<PopulateData>();
+
 
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();

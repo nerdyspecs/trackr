@@ -2,6 +2,7 @@
 using trackr_api.Model;
 using trackr_api.Data;
 using Microsoft.EntityFrameworkCore;
+using System.Text.Json;
 
 namespace trackr_api.Controllers
 {
@@ -15,28 +16,59 @@ namespace trackr_api.Controllers
             _context = context;
         }
 
+
+        // Configure the JsonSerializer options for circular reference handling
+        private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+        {
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve, // Handle circular references
+            WriteIndented = true // Optional: Makes the output more readable
+        };
+
+
         // Return all job statuses
         [HttpGet]
         public async Task <ActionResult<List<JobStatus>>> GetAllJobStatuses()
         {
-            var jobStatuses = await _context.JobStatuses.ToListAsync();
-            if (jobStatuses == null || jobStatuses.Count == 0)
+            var jobstatuses = await _context.JobStatuses.ToListAsync();
+            if (jobstatuses == null || jobstatuses.Count == 0)
             {
                 return NotFound("Job status list not found");
             }
-            return Ok(jobStatuses);
+            else {
+                var jsonResponse = jobstatuses.Select(jobstatus => new
+                {
+                    JobStatusId = jobstatus.JobStatusId,
+                    JobStatusTitle = jobstatus.JobStatusTitle,
+                    JobStatusDescription = jobstatus.JobStatusDescription,
+                    JobStatusCreateAt = jobstatus.CreatedAt,
+                    JobStatusModifiedAt = jobstatus.ModifiedAt
+                });
+
+                return Ok(JsonSerializer.Serialize(jsonResponse, _jsonSerializerOptions));
+            }
         }
 
         // Get a specific job status by ID
         [HttpGet("{job_status_id}")]
         public IActionResult GetJobStatus(int job_status_id)
         {
-            var jobStatus = _context.JobStatuses.Find(job_status_id);
-            if (jobStatus == null)
+            var jobstatus = _context.JobStatuses.Find(job_status_id);
+            if (jobstatus == null)
             {
                 return NotFound($"Job status with id {job_status_id} not found");
             }
-            return Ok(jobStatus);
+            else {
+                var jsonResponse = new
+                {
+                    JobStatusId = jobstatus.JobStatusId,
+                    JobStatusTitle = jobstatus.JobStatusTitle,
+                    JobStatusDescription = jobstatus.JobStatusDescription,
+                    JobStatusCreateAt = jobstatus.CreatedAt,
+                    JobStatusModifiedAt = jobstatus.ModifiedAt
+                };
+
+                return Ok(JsonSerializer.Serialize(jsonResponse, _jsonSerializerOptions));
+            }
         }
 
         // Create a new job status
