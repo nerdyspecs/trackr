@@ -18,5 +18,9 @@ namespace trackr_api.Model
         // foreignkey
         public int? CustomerId { get; set; }
         public Customer Customer { get; set; }
+
+
+        // Navigation Property
+        public virtual ICollection<Job> Jobs{ get; set; }
     }
 }

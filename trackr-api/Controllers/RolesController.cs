@@ -1,5 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Data;
+using System.Text.Json;
 using trackr_api.Data;
 using trackr_api.Model;
 
@@ -15,6 +17,13 @@ namespace trackr_api.Controllers
             _context = context;
         }
 
+        // Configure the JsonSerializer options for circular reference handling
+        private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+        {
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve, // Handle circular references
+            WriteIndented = true // Optional: Makes the output more readable
+        };
+
         [HttpGet]
         public async Task<ActionResult<List<Role>>> GetAllRoles()
         {
@@ -24,7 +33,14 @@ namespace trackr_api.Controllers
                 return NotFound("Roles not found");
             }
             else {
-                return Ok(roles);
+                var jsonResponse = roles.Select(role => new
+                {
+                   RoleId = role.RoleId,
+                   RoleName = role.RoleName,
+                   RoleDescription = role.RoleDescription
+                });
+
+                return Ok(JsonSerializer.Serialize(jsonResponse, _jsonSerializerOptions));
             }
         }
 
@@ -37,7 +53,14 @@ namespace trackr_api.Controllers
                 return NotFound($"Role with id {role_id} not found");
             }
             else {
-                return Ok(role);
+                var jsonResponse = new
+                {
+                    RoleId = role.RoleId,
+                    RoleName = role.RoleName,
+                    RoleDescription = role.RoleDescription
+                };
+
+                return Ok(JsonSerializer.Serialize(jsonResponse, _jsonSerializerOptions));
             }
         }
 

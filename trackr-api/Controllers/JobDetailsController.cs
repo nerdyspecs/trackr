@@ -2,6 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using trackr_api.Model;
 using trackr_api.Data;
+using System.Text.Json;
 
 namespace trackr_api.Controllers
 {
@@ -16,18 +17,39 @@ namespace trackr_api.Controllers
             _context = context;
         }
 
+
+        // Configure the JsonSerializer options for circular reference handling
+        private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+        {
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve, // Handle circular references
+            WriteIndented = true // Optional: Makes the output more readable
+        };
+
         // Return all job details
         [HttpGet]
         public async Task<ActionResult<List<JobDetail>>> GetAllJobDetails()
         {
-            var jobDetails = await _context.JobDetails.ToListAsync();
+            var jobDetails = await _context.JobDetails
+                .Include(jobdetail => jobdetail.JobStatus)
+                .ToListAsync();
             if (jobDetails == null)
             {
                 return NotFound("Job details list not found");
             }
             else
             {
-                return Ok(jobDetails);
+                var JsonResponse = jobDetails.Select(jobdetail => new 
+                { 
+                    Job = new { 
+                        JobId = jobdetail.JobId
+                    },
+                    JobDetailId = jobdetail.JobDetailId,
+                    JobDetailTitle = jobdetail.Title,
+                    JobDetailDescription = jobdetail.Description,
+                    JobDetailJobStatus = jobdetail.JobStatus.JobStatusTitle,
+                    JobDetailCreateAt = jobdetail.CreatedAt
+                });
+                return Ok(JsonSerializer.Serialize(JsonResponse,_jsonSerializerOptions));
             }
         }
 
@@ -35,14 +57,31 @@ namespace trackr_api.Controllers
         [HttpGet("{job_detail_id}")]
         public IActionResult GetJobDetail(int job_detail_id)
         {
-            var jobDetail = _context.JobDetails.Find(job_detail_id);
-            if (jobDetail == null)
+            var jobdetail = _context.JobDetails
+                .Include(job => job.JobStatus)
+                .Include(jobdetail => jobdetail.Job)
+                .ThenInclude(job => job.JobStatus)
+                .FirstOrDefault(jobdetail => jobdetail.JobDetailId == job_detail_id);
+            if (jobdetail == null)
             {
                 return NotFound($"Job detail with ID {job_detail_id} not found");
             }
             else
             {
-                return Ok(jobDetail);
+
+                var JsonResponse =  new
+                {
+                    Job = new
+                    {
+                        JobId = jobdetail.JobId
+                    },
+                    JobDetailId = jobdetail.JobDetailId,
+                    JobDetailTitle = jobdetail.Title,
+                    JobDetailDescription = jobdetail.Description,
+                    JobDetailJobStatus = jobdetail.JobStatus.JobStatusTitle,
+                    JobDetailCreateAt = jobdetail.CreatedAt
+                };
+                return Ok(JsonSerializer.Serialize(JsonResponse, _jsonSerializerOptions));
             }
         }
 

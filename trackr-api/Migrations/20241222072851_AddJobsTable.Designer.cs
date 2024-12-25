@@ -2,6 +2,7 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using trackr_api.Data;
 
@@ -10,9 +11,11 @@ using trackr_api.Data;
 namespace trackr_api.Migrations
 {
     [DbContext(typeof(TrackrDbContext))]
-    partial class TrackrDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241222072851_AddJobsTable")]
+    partial class AddJobsTable
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

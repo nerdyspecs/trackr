@@ -5,7 +5,7 @@ namespace trackr_api.Model
 {
     public class JobDetail
     {
-        [Key] // Mark UserId as the Primary Key
+        [Key] // Mark JobDetailId as the Primary Key
         [DatabaseGenerated(DatabaseGeneratedOption.Identity)] // Automatically generate JobDetailId (auto-increment)
         public int JobDetailId { get; set; }
         public string Title { get; set; }
