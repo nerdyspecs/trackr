@@ -229,6 +229,7 @@ namespace trackr_api.Controllers
               .Include(vehicle => vehicle.Customer)         // Include Customer related to the vehicle
               .Include(vehicle => vehicle.Jobs)             // Include Jobs for the vehicle
                   .ThenInclude(job => job.JobStatus)        // Include JobStatus for each Job
+            .FirstOrDefault(vehicle => vehicle.VehicleId == vehicle_id); // Fetch the vehicle by ID
 
             if (vehicle == null)
             {

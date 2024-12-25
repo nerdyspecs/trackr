@@ -1,3 +1,11 @@
+C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.csproj.AssemblyReference.cache
+C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.GeneratedMSBuildEditorConfig.editorconfig
+C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.AssemblyInfoInputs.cache
+C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.AssemblyInfo.cs
+C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.csproj.CoreCompileInputs.cache
+C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.MvcApplicationPartsAssemblyInfo.cs
+C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.MvcApplicationPartsAssemblyInfo.cache
+C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.sourcelink.json
 C:\Users\teckhong\source\repos\trackr-api\trackr-api\bin\Debug\net8.0\appsettings.Development.json
 C:\Users\teckhong\source\repos\trackr-api\trackr-api\bin\Debug\net8.0\appsettings.json
 C:\Users\teckhong\source\repos\trackr-api\trackr-api\bin\Debug\net8.0\trackr-api.exe
@@ -91,14 +99,6 @@ C:\Users\teckhong\source\repos\trackr-api\trackr-api\bin\Debug\net8.0\tr\Microso
 C:\Users\teckhong\source\repos\trackr-api\trackr-api\bin\Debug\net8.0\zh-Hans\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\teckhong\source\repos\trackr-api\trackr-api\bin\Debug\net8.0\zh-Hant\Microsoft.CodeAnalysis.Workspaces.resources.dll
 C:\Users\teckhong\source\repos\trackr-api\trackr-api\bin\Debug\net8.0\runtimes\browser\lib\net8.0\System.Text.Encodings.Web.dll
-C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.csproj.AssemblyReference.cache
-C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.GeneratedMSBuildEditorConfig.editorconfig
-C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.AssemblyInfoInputs.cache
-C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.AssemblyInfo.cs
-C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.csproj.CoreCompileInputs.cache
-C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.MvcApplicationPartsAssemblyInfo.cs
-C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.MvcApplicationPartsAssemblyInfo.cache
-C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\trackr-api.sourcelink.json
 C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\staticwebassets.build.json
 C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\staticwebassets.development.json
 C:\Users\teckhong\source\repos\trackr-api\trackr-api\obj\Debug\net8.0\staticwebassets\msbuild.trackr-api.Microsoft.AspNetCore.StaticWebAssets.props
