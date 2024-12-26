@@ -51,7 +51,7 @@
             {
               "kind": "v12.0",
               "location": "[parameters('resourceLocation')]",
-              "name": "trackr-apidbserver",
+              "name": "trackr-api-server",
               "type": "Microsoft.Sql/servers",
               "apiVersion": "2017-10-01-preview"
             },
@@ -63,11 +63,11 @@
               },
               "kind": "v12.0,user",
               "location": "[parameters('resourceLocation')]",
-              "name": "trackr-apidbserver/trackr-api_db",
+              "name": "trackr-api-server/trackr-api_db",
               "type": "Microsoft.Sql/servers/databases",
               "apiVersion": "2017-10-01-preview",
               "dependsOn": [
-                "trackr-apidbserver"
+                "trackr-api-server"
               ]
             }
           ]
