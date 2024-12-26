@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.11.35327.3
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "trackr-api", "trackr-api\trackr-api.csproj", "{5F4A3F83-D611-4970-B2F5-68BEDC68B784}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{5F4A3F83-D611-4970-B2F5-68BEDC68B784}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{5F4A3F83-D611-4970-B2F5-68BEDC68B784}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{5F4A3F83-D611-4970-B2F5-68BEDC68B784}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{5F4A3F83-D611-4970-B2F5-68BEDC68B784}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {B812EA0A-7A37-45D2-AEBC-B768E742CF00}
+	EndGlobalSection
+EndGlobal
