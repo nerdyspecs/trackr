@@ -6,6 +6,11 @@
       "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourcegroups/[parameters('resourceGroupName')]/providers/Microsoft.Sql/servers/trackr-apidbserver/databases/trackr-api_db",
       "type": "mssql.azure",
       "connectionId": "ConnectionStrings:DefaultConnection"
+    },
+    "apis1": {
+      "apiEndpoint": "https://trackr-api.azure-api.net/",
+      "resourceId": "/subscriptions/[parameters('subscriptionId')]/resourceGroups/[parameters('resourceGroupName')]/providers/Microsoft.ApiManagement/service/trackr-api/apis/trackr-api",
+      "type": "apis.azure"
     }
   }
 }

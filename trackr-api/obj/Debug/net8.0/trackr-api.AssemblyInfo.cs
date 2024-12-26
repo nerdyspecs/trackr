@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("trackr-api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+d0a10b44c958b06cd1d3fd8e52cc9ac9618069f3")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+bf917cdbe4c2db42bee07e8b5e556d88cd5e9668")]
 [assembly: System.Reflection.AssemblyProductAttribute("trackr-api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("trackr-api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
