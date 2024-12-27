@@ -7,9 +7,15 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllers();
 
-// Register DbContext with SQL Server connection
 builder.Services.AddDbContext<TrackrDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    var connectionStringName = builder.Environment.IsDevelopment() ? "LocalConnection" : "ProductionConnection";
+    options.UseSqlServer(builder.Configuration.GetConnectionString(connectionStringName));
+});
+
+// Register DbContext with SQL Server connection
+//builder.Services.AddDbContext<TrackrDbContext>(options =>
+//    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddScoped<PopulateData>();
 

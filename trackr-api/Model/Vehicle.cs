@@ -1,5 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations.Schema;
 using System.ComponentModel.DataAnnotations;
+using trackr_api.Model;
 
 namespace trackr_api.Model
 {
@@ -24,3 +25,5 @@ namespace trackr_api.Model
         public virtual ICollection<Job> Jobs{ get; set; }
     }
 }
+
+
