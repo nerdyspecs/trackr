@@ -3,45 +3,49 @@ using trackr_api.Model;
 using trackr_api.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
-using System.Data;
+using Microsoft.Extensions.Logging;
+using System;
+using trackr_api.Filters;
+
 
 namespace trackr_api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class UsersController : Controller
+    public class UsersController : BaseController
     {
         private readonly TrackrDbContext _context;
-        public UsersController(TrackrDbContext context)
+
+        public UsersController(TrackrDbContext context, ILogger<UsersController> logger)
+            : base(logger) 
         {
             _context = context;
         }
 
-        // Configure the JsonSerializer options for circular reference handling
-        private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
+        private readonly JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
         {
-            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve, // Handle circular references
-            WriteIndented = true // Optional: Makes the output more readable
+            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve,
+            WriteIndented = true
         };
 
         [HttpGet]
-        public async Task<ActionResult<List<User>>> GetAllUser()
+        [ServiceFilter(typeof(AuthFilter))]
+        public async Task<IActionResult> GetAllUser()
         {
-            var users = await _context.Users
-                .Include(user => user.Role)
-                .ToListAsync();
-            if (users == null)
+            try
             {
-                return NotFound("users not found");
-            }
-            else {
+                var users = await _context.Users.Include(user => user.Role).ToListAsync();
+                if (users == null || users.Count == 0)
+                    return NotFound("Users not found");
+
                 var jsonResponse = users.Select(user => new
                 {
                     UserId = user.UserId,
                     UserUsername = user.Username,
-                    UserRole = new { 
+                    UserRole = new
+                    {
                         RoleId = user.Role.RoleId,
-                        RoleName = user.Role.RoleName,
+                        RoleName = user.Role.RoleName
                     },
                     UserCreatedAt = user.CreatedAt,
                     UserModifiedAt = user.ModifiedAt
@@ -49,19 +53,25 @@ namespace trackr_api.Controllers
 
                 return Ok(JsonSerializer.Serialize(jsonResponse, _jsonSerializerOptions));
             }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
         }
 
         [HttpGet("{user_id}")]
+        [ServiceFilter(typeof(AuthFilter))]
         public IActionResult GetUser(int user_id)
         {
-            var user = _context.Users
-            .Include(user => user.Role)
-            .FirstOrDefault(user => user.UserId == user_id);
-            if (user == null)
+            try
             {
-                return NotFound();
-            }
-            else {
+                var user = _context.Users
+                    .Include(user => user.Role)
+                    .FirstOrDefault(user => user.UserId == user_id);
+
+                if (user == null)
+                    return NotFound($"User {user_id} not found");
+
                 var jsonResponse = new
                 {
                     UserId = user.UserId,
@@ -69,7 +79,7 @@ namespace trackr_api.Controllers
                     UserRole = new
                     {
                         RoleId = user.Role.RoleId,
-                        RoleName = user.Role.RoleName,
+                        RoleName = user.Role.RoleName
                     },
                     UserCreatedAt = user.CreatedAt,
                     UserModifiedAt = user.ModifiedAt
@@ -77,73 +87,78 @@ namespace trackr_api.Controllers
 
                 return Ok(JsonSerializer.Serialize(jsonResponse, _jsonSerializerOptions));
             }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
         }
 
         [HttpPost]
+        [ServiceFilter(typeof(AuthFilter))]
         public IActionResult CreateUser([FromBody] User new_user)
         {
-            User user = new User
+            try
             {
-                Username = new_user.Username,
-                RoleId = new_user.RoleId,
-                PasswordHash = new_user.PasswordHash
-            };
-            _context.Users.Add(user);
+                var user = new User
+                {
+                    Username = new_user.Username,
+                    RoleId = new_user.RoleId,
+                    PasswordHash = new_user.PasswordHash
+                };
+                _context.Users.Add(user);
+                _context.SaveChanges();
 
-            if (_context.SaveChanges() > 0) 
-            {
-                return CreatedAtAction(nameof(GetUser), new { id = user.UserId }, user);
+                return CreatedAtAction(nameof(GetUser), new { user_id = user.UserId }, user);
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest("User not created. Something went wrong.");
+                return HandleError(ex);
             }
         }
 
-
-        [HttpPatch("user_id")]
+        [HttpPatch("{user_id}")]
+        [ServiceFilter(typeof(AuthFilter))]
         public IActionResult UpdateUser(int user_id, [FromBody] User updated_user)
         {
-            var user = _context.Users.Find(user_id);
-            if (user == null)
+            try
             {
-                return NotFound($"User with is {user_id} not found");
-            }
-            else { 
+                var user = _context.Users.Find(user_id);
+                if (user == null)
+                    return NotFound($"User {user_id} not found");
+
                 user.Username = updated_user.Username;
                 user.PasswordHash = updated_user.PasswordHash;
                 user.RoleId = updated_user.RoleId;
                 user.ModifiedAt = DateTime.Now;
                 _context.Users.Update(user);
-                if (_context.SaveChanges() > 0)
-                {
-                    return Ok($"User {user.UserId} updated successfully");
-                }
-                else
-                {
-                    return BadRequest($"User {user.UserId} not updated. Something went wrong.");
-                }
-            }            
+                _context.SaveChanges();
+
+                return Ok($"User {user.UserId} updated successfully");
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
         }
 
-
         [HttpDelete("{user_id}")]
+        [ServiceFilter(typeof(AuthFilter))]
         public IActionResult DeleteUser(int user_id)
         {
-            var user = _context.Users.Find(user_id);
-            if (user == null)
+            try
             {
-                return NotFound($"User {user_id} not found");
-            }
-            else { 
+                var user = _context.Users.Find(user_id);
+                if (user == null)
+                    return NotFound($"User {user_id} not found");
+
                 _context.Users.Remove(user);
-                if (_context.SaveChanges() > 0)
-                {
-                    return Ok($"User Deleted: {user}");
-                }
-                else {
-                    return BadRequest($"User {user.UserId} not deleted. Something went wrong");
-                }
+                _context.SaveChanges();
+
+                return Ok($"User {user_id} deleted successfully");
+            }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
             }
         }
     }

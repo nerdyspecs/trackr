@@ -494,17 +494,7 @@
     "IsController": true,
     "Order": 0,
     "Parameters": [],
-    "ReturnTypes": [
-      {
-        "Type": "System.Collections.Generic.List\u00601[[trackr_api.Model.User, trackr-api, Version=1.0.0.0, Culture=neutral, PublicKeyToken=null]]",
-        "MediaTypes": [
-          "text/plain",
-          "application/json",
-          "text/json"
-        ],
-        "StatusCode": 200
-      }
-    ]
+    "ReturnTypes": []
   },
   {
     "ContainingType": "trackr_api.Controllers.UsersController",
@@ -540,6 +530,27 @@
   },
   {
     "ContainingType": "trackr_api.Controllers.UsersController",
+    "Method": "UpdateUser",
+    "RelativePath": "api/Users/{user_id}",
+    "HttpMethod": "PATCH",
+    "IsController": true,
+    "Order": 0,
+    "Parameters": [
+      {
+        "Name": "user_id",
+        "Type": "System.Int32",
+        "IsRequired": true
+      },
+      {
+        "Name": "updated_user",
+        "Type": "trackr_api.Model.User",
+        "IsRequired": true
+      }
+    ],
+    "ReturnTypes": []
+  },
+  {
+    "ContainingType": "trackr_api.Controllers.UsersController",
     "Method": "DeleteUser",
     "RelativePath": "api/Users/{user_id}",
     "HttpMethod": "DELETE",
@@ -549,27 +560,6 @@
       {
         "Name": "user_id",
         "Type": "System.Int32",
-        "IsRequired": true
-      }
-    ],
-    "ReturnTypes": []
-  },
-  {
-    "ContainingType": "trackr_api.Controllers.UsersController",
-    "Method": "UpdateUser",
-    "RelativePath": "api/Users/user_id",
-    "HttpMethod": "PATCH",
-    "IsController": true,
-    "Order": 0,
-    "Parameters": [
-      {
-        "Name": "user_id",
-        "Type": "System.Int32",
-        "IsRequired": false
-      },
-      {
-        "Name": "updated_user",
-        "Type": "trackr_api.Model.User",
         "IsRequired": true
       }
     ],

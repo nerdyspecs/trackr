@@ -1,11 +1,18 @@
 using Microsoft.EntityFrameworkCore;
 using trackr_api.Data;
+using trackr_api.Filters;
 using trackr_api.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllers();
+
+//builder.Services.AddControllers(options =>
+//{
+//    options.Filters.Add<BaseController>();  // Make sure this line is present
+//});
+
 
 builder.Services.AddDbContext<TrackrDbContext>(options =>
 {
@@ -16,6 +23,12 @@ builder.Services.AddDbContext<TrackrDbContext>(options =>
 // Register DbContext with SQL Server connection
 //builder.Services.AddDbContext<TrackrDbContext>(options =>
 //    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+//Adding Filters
+builder.Services.AddScoped<ActionLoggingFilter>();
+builder.Services.AddScoped<AuthFilter>();
+
+
 
 builder.Services.AddScoped<PopulateData>();
 
