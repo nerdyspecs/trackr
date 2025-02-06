@@ -3,20 +3,20 @@ using Microsoft.EntityFrameworkCore;
 using trackr_api.Model;
 using trackr_api.Data;
 using System.Text.Json;
+using trackr_api.Filters;
 
 namespace trackr_api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class JobDetailController : Controller
+    public class JobDetailController : BaseController
     {
         private readonly TrackrDbContext _context;
 
-        public JobDetailController(TrackrDbContext context)
+        public JobDetailController(TrackrDbContext context, ILogger<JobDetailController> logger): base(logger)
         {
             _context = context;
         }
-
 
         // Configure the JsonSerializer options for circular reference handling
         private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
@@ -27,137 +27,179 @@ namespace trackr_api.Controllers
 
         // Return all job details
         [HttpGet]
-        public async Task<ActionResult<List<JobDetail>>> GetAllJobDetails()
+        [ServiceFilter(typeof(AuthFilter))]
+        public async Task<IActionResult> GetAllJobDetails()
         {
-            var jobDetails = await _context.JobDetails
-                .Include(jobdetail => jobdetail.JobStatus)
-                .ToListAsync();
-            if (jobDetails == null)
+            try
             {
-                return NotFound("Job details list not found");
+                var jobDetails = await _context.JobDetails
+               .Include(jobdetail => jobdetail.JobStatus)
+               .ToListAsync();
+                if (jobDetails == null)
+                {
+                    return NotFound("Job details list not found");
+                }
+                else
+                {
+                    var JsonResponse = jobDetails.Select(jobdetail => new
+                    {
+                        Job = new
+                        {
+                            JobId = jobdetail.JobId
+                        },
+                        JobDetailId = jobdetail.JobDetailId,
+                        JobDetailTitle = jobdetail.Title,
+                        JobDetailDescription = jobdetail.Description,
+                        JobDetailJobStatus = jobdetail.JobStatus.JobStatusTitle,
+                        JobDetailCreateAt = jobdetail.CreatedAt
+                    });
+                    return Ok(JsonSerializer.Serialize(JsonResponse, _jsonSerializerOptions));
+                }
             }
-            else
-            {
-                var JsonResponse = jobDetails.Select(jobdetail => new 
-                { 
-                    Job = new { 
-                        JobId = jobdetail.JobId
-                    },
-                    JobDetailId = jobdetail.JobDetailId,
-                    JobDetailTitle = jobdetail.Title,
-                    JobDetailDescription = jobdetail.Description,
-                    JobDetailJobStatus = jobdetail.JobStatus.JobStatusTitle,
-                    JobDetailCreateAt = jobdetail.CreatedAt
-                });
-                return Ok(JsonSerializer.Serialize(JsonResponse,_jsonSerializerOptions));
+            catch (Exception ex) { 
+                return HandleError(ex);
             }
+           
         }
 
         // Return a specific job detail by ID
         [HttpGet("{job_detail_id}")]
+        [ServiceFilter(typeof(AuthFilter))]
         public IActionResult GetJobDetail(int job_detail_id)
         {
-            var jobdetail = _context.JobDetails
+            try
+            {
+                var jobdetail = _context.JobDetails
                 .Include(job => job.JobStatus)
                 .Include(jobdetail => jobdetail.Job)
                 .ThenInclude(job => job.JobStatus)
                 .FirstOrDefault(jobdetail => jobdetail.JobDetailId == job_detail_id);
-            if (jobdetail == null)
-            {
-                return NotFound($"Job detail with ID {job_detail_id} not found");
-            }
-            else
-            {
-
-                var JsonResponse =  new
+                if (jobdetail == null)
                 {
-                    Job = new
+                    return NotFound($"Job detail with ID {job_detail_id} not found");
+                }
+                else
+                {
+
+                    var JsonResponse = new
                     {
-                        JobId = jobdetail.JobId
-                    },
-                    JobDetailId = jobdetail.JobDetailId,
-                    JobDetailTitle = jobdetail.Title,
-                    JobDetailDescription = jobdetail.Description,
-                    JobDetailJobStatus = jobdetail.JobStatus.JobStatusTitle,
-                    JobDetailCreateAt = jobdetail.CreatedAt
-                };
-                return Ok(JsonSerializer.Serialize(JsonResponse, _jsonSerializerOptions));
+                        Job = new
+                        {
+                            JobId = jobdetail.JobId
+                        },
+                        JobDetailId = jobdetail.JobDetailId,
+                        JobDetailTitle = jobdetail.Title,
+                        JobDetailDescription = jobdetail.Description,
+                        JobDetailJobStatus = jobdetail.JobStatus.JobStatusTitle,
+                        JobDetailCreateAt = jobdetail.CreatedAt
+                    };
+                    return Ok(JsonSerializer.Serialize(JsonResponse, _jsonSerializerOptions));
+                }
+            }
+            catch (Exception ex) {
+                return HandleError(ex);
             }
         }
 
         // Create a new job detail
         [HttpPost]
+        [ServiceFilter(typeof(AuthFilter))]
         public IActionResult CreateJobDetail([FromBody] JobDetail new_job_detail)
         {
-            JobDetail jobDetail = new JobDetail
+            try
             {
-                Title = new_job_detail.Title,
-                Description = new_job_detail.Description,
-                JobId = new_job_detail.JobId,
-                JobStatusId = new_job_detail.JobStatusId
-            };
-            _context.JobDetails.Add(new_job_detail);
+                JobDetail jobDetail = new JobDetail
+                {
+                    Title = new_job_detail.Title,
+                    Description = new_job_detail.Description,
+                    JobId = new_job_detail.JobId,
+                    JobStatusId = new_job_detail.JobStatusId
+                };
+                _context.JobDetails.Add(new_job_detail);
 
-            if (_context.SaveChanges() > 0)
-            {
-                return CreatedAtAction(nameof(GetJobDetail), new { job_detail_id = jobDetail.JobDetailId }, jobDetail);
+                if (_context.SaveChanges() > 0)
+                {
+                    return CreatedAtAction(nameof(GetJobDetail), new { job_detail_id = jobDetail.JobDetailId }, jobDetail);
+                }
+                else
+                {
+                    return BadRequest("Job detail not created. Something went wrong.");
+                }
             }
-            else
-            {
-                return BadRequest("Job detail not created. Something went wrong.");
+            catch (Exception ex) {
+                return HandleError(ex);
             }
+            
         }
 
         // Update a job detail
         [HttpPatch("{job_detail_id}")]
+        [ServiceFilter(typeof(AuthFilter))]
         public IActionResult UpdateJobDetail(int job_detail_id, [FromBody] JobDetail updated_job_detail)
         {
-            var jobDetail = _context.JobDetails.Find(job_detail_id);
-            if (jobDetail == null)
+            try
             {
-                return NotFound($"Job detail with ID {job_detail_id} not found");
-            }
-            else
-            {
-                jobDetail.Title = updated_job_detail.Title;
-                jobDetail.Description = updated_job_detail.Description;
-                jobDetail.JobId = updated_job_detail.JobId;
-                jobDetail.JobStatusId = updated_job_detail.JobStatusId;
-                jobDetail.ModifiedAt = DateTime.Now;
-
-                _context.JobDetails.Update(jobDetail);
-                if (_context.SaveChanges() > 0)
+                var jobDetail = _context.JobDetails.Find(job_detail_id);
+                if (jobDetail == null)
                 {
-                    return Ok($"Job detail {jobDetail.JobDetailId} updated successfully");
+                    return NotFound($"Job detail with ID {job_detail_id} not found");
                 }
                 else
                 {
-                    return BadRequest($"Job detail {jobDetail.JobDetailId} not updated. Something went wrong.");
+                    jobDetail.Title = updated_job_detail.Title;
+                    jobDetail.Description = updated_job_detail.Description;
+                    jobDetail.JobId = updated_job_detail.JobId;
+                    jobDetail.JobStatusId = updated_job_detail.JobStatusId;
+                    jobDetail.ModifiedAt = DateTime.Now;
+
+                    _context.JobDetails.Update(jobDetail);
+                    if (_context.SaveChanges() > 0)
+                    {
+                        return Ok($"Job detail {jobDetail.JobDetailId} updated successfully");
+                    }
+                    else
+                    {
+                        return BadRequest($"Job detail {jobDetail.JobDetailId} not updated. Something went wrong.");
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+            
         }
 
         // Delete a job detail
         [HttpDelete("{job_detail_id}")]
+        [ServiceFilter(typeof(AuthFilter))]
         public IActionResult DeleteJobDetail(int job_detail_id)
         {
-            var jobDetail = _context.JobDetails.Find(job_detail_id);
-            if (jobDetail == null)
+            try
             {
-                return NotFound($"Job detail {job_detail_id} not found");
-            }
-            else
-            {
-                _context.JobDetails.Remove(jobDetail);
-                if (_context.SaveChanges() > 0)
+                var jobDetail = _context.JobDetails.Find(job_detail_id);
+                if (jobDetail == null)
                 {
-                    return Ok($"Job detail {jobDetail.JobDetailId} deleted successfully");
+                    return NotFound($"Job detail {job_detail_id} not found");
                 }
                 else
                 {
-                    return BadRequest($"Job detail {jobDetail.JobDetailId} not deleted. Something went wrong.");
+                    _context.JobDetails.Remove(jobDetail);
+                    if (_context.SaveChanges() > 0)
+                    {
+                        return Ok($"Job detail {jobDetail.JobDetailId} deleted successfully");
+                    }
+                    else
+                    {
+                        return BadRequest($"Job detail {jobDetail.JobDetailId} not deleted. Something went wrong.");
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+            
         }
     }
 }
