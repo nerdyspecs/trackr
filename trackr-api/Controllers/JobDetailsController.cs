@@ -13,17 +13,10 @@ namespace trackr_api.Controllers
     {
         private readonly TrackrDbContext _context;
 
-        public JobDetailController(TrackrDbContext context, ILogger<JobDetailController> logger): base(logger)
+        public JobDetailController(TrackrDbContext context, ILogger<JobDetailController> logger) : base(logger)
         {
             _context = context;
         }
-
-        // Configure the JsonSerializer options for circular reference handling
-        private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
-        {
-            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve, // Handle circular references
-            WriteIndented = true // Optional: Makes the output more readable
-        };
 
         // Return all job details
         [HttpGet]

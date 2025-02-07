@@ -17,13 +17,6 @@ namespace trackr_api.Controllers
             _context = context;
         }
 
-        // Configure the JsonSerializer options for circular reference handling
-        private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
-        {
-            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve, // Handle circular references
-            WriteIndented = true // Optional: Makes the output more readable
-        };
-
         // Return all jobs
         [HttpGet]
         [ServiceFilter(typeof(AuthFilter))]

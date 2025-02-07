@@ -3,95 +3,116 @@ using trackr_api.Model;
 using trackr_api.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Text.Json;
+using trackr_api.Filters;
 
 namespace trackr_api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
-    public class JobStatusController : Controller
+    public class JobStatusController : BaseController
     {
         private readonly TrackrDbContext _context;
-        public JobStatusController(TrackrDbContext context)
+        public JobStatusController(TrackrDbContext context, ILogger<JobStatusController> logger) : base (logger)
         {
             _context = context;
         }
 
-
-        // Configure the JsonSerializer options for circular reference handling
-        private JsonSerializerOptions _jsonSerializerOptions = new JsonSerializerOptions
-        {
-            ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve, // Handle circular references
-            WriteIndented = true // Optional: Makes the output more readable
-        };
-
-
         // Return all job statuses
         [HttpGet]
-        public async Task <ActionResult<List<JobStatus>>> GetAllJobStatuses()
+        [ServiceFilter(typeof(AuthFilter))]
+        public async Task <IActionResult> GetAllJobStatuses()
         {
-            var jobstatuses = await _context.JobStatuses.ToListAsync();
-            if (jobstatuses == null || jobstatuses.Count == 0)
+            try
             {
-                return NotFound("Job status list not found");
-            }
-            else {
-                var jsonResponse = jobstatuses.Select(jobstatus => new
+                var jobstatuses = await _context.JobStatuses.ToListAsync();
+                if (jobstatuses == null || jobstatuses.Count == 0)
                 {
-                    JobStatusId = jobstatus.JobStatusId,
-                    JobStatusTitle = jobstatus.JobStatusTitle,
-                    JobStatusDescription = jobstatus.JobStatusDescription,
-                    JobStatusCreateAt = jobstatus.CreatedAt,
-                    JobStatusModifiedAt = jobstatus.ModifiedAt
-                });
+                    return NotFound("Job status list not found");
+                }
+                else
+                {
+                    var jsonResponse = jobstatuses.Select(jobstatus => new
+                    {
+                        JobStatusId = jobstatus.JobStatusId,
+                        JobStatusTitle = jobstatus.JobStatusTitle,
+                        JobStatusDescription = jobstatus.JobStatusDescription,
+                        JobStatusCreateAt = jobstatus.CreatedAt,
+                        JobStatusModifiedAt = jobstatus.ModifiedAt
+                    });
 
-                return Ok(JsonSerializer.Serialize(jsonResponse, _jsonSerializerOptions));
+                    return Ok(JsonSerializer.Serialize(jsonResponse, _jsonSerializerOptions));
+                }
             }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+           
         }
 
         // Get a specific job status by ID
         [HttpGet("{job_status_id}")]
+        [ServiceFilter(typeof(AuthFilter))] 
         public IActionResult GetJobStatus(int job_status_id)
         {
-            var jobstatus = _context.JobStatuses.Find(job_status_id);
-            if (jobstatus == null)
+            try
             {
-                return NotFound($"Job status with id {job_status_id} not found");
-            }
-            else {
-                var jsonResponse = new
+                var jobstatus = _context.JobStatuses.Find(job_status_id);
+                if (jobstatus == null)
                 {
-                    JobStatusId = jobstatus.JobStatusId,
-                    JobStatusTitle = jobstatus.JobStatusTitle,
-                    JobStatusDescription = jobstatus.JobStatusDescription,
-                    JobStatusCreateAt = jobstatus.CreatedAt,
-                    JobStatusModifiedAt = jobstatus.ModifiedAt
-                };
+                    return NotFound($"Job status with id {job_status_id} not found");
+                }
+                else
+                {
+                    var jsonResponse = new
+                    {
+                        JobStatusId = jobstatus.JobStatusId,
+                        JobStatusTitle = jobstatus.JobStatusTitle,
+                        JobStatusDescription = jobstatus.JobStatusDescription,
+                        JobStatusCreateAt = jobstatus.CreatedAt,
+                        JobStatusModifiedAt = jobstatus.ModifiedAt
+                    };
 
-                return Ok(JsonSerializer.Serialize(jsonResponse, _jsonSerializerOptions));
+                    return Ok(JsonSerializer.Serialize(jsonResponse, _jsonSerializerOptions));
+                }
             }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+         
         }
 
         // Create a new job status
         [HttpPost]
+        [ServiceFilter(typeof(AuthFilter))]
         public IActionResult CreateJobStatus([FromBody] JobStatus new_job_status)
         {
-            JobStatus jobStatus = new JobStatus
+            try
             {
-                JobStatusTitle = new_job_status.JobStatusTitle,
-                JobStatusDescription = new_job_status.JobStatusDescription,
-                CreatedAt = DateTime.Now,
-                ModifiedAt = DateTime.Now
-            };
-            _context.JobStatuses.Add(jobStatus);
+                JobStatus jobStatus = new JobStatus
+                {
+                    JobStatusTitle = new_job_status.JobStatusTitle,
+                    JobStatusDescription = new_job_status.JobStatusDescription,
+                    CreatedAt = DateTime.Now,
+                    ModifiedAt = DateTime.Now
+                };
+                _context.JobStatuses.Add(jobStatus);
 
-            if (_context.SaveChanges() > 0)
-            {
-                return CreatedAtAction(nameof(GetJobStatus), new { job_status_id = jobStatus.JobStatusId }, jobStatus);
+                if (_context.SaveChanges() > 0)
+                {
+                    return CreatedAtAction(nameof(GetJobStatus), new { job_status_id = jobStatus.JobStatusId }, jobStatus);
+                }
+                else
+                {
+                    return BadRequest("Job status not created. Something went wrong.");
+                }
             }
-            else
+            catch (Exception ex)
             {
-                return BadRequest("Job status not created. Something went wrong.");
+                return HandleError(ex);
             }
+           
         }
 
         // Update a job status
@@ -123,25 +144,34 @@ namespace trackr_api.Controllers
 
         // Delete a job status
         [HttpDelete("{job_status_id}")]
+        [ServiceFilter(typeof(AuthFilter))]
         public IActionResult DeleteJobStatus(int job_status_id)
         {
-            var jobStatus = _context.JobStatuses.Find(job_status_id);
-            if (jobStatus == null)
+            try
             {
-                return NotFound($"Job status with id {job_status_id} not found");
-            }
-            else
-            {
-                _context.JobStatuses.Remove(jobStatus);
-                if (_context.SaveChanges() > 0)
+                var jobStatus = _context.JobStatuses.Find(job_status_id);
+                if (jobStatus == null)
                 {
-                    return Ok($"Job status {jobStatus.JobStatusId} deleted successfully");
+                    return NotFound($"Job status with id {job_status_id} not found");
                 }
                 else
                 {
-                    return BadRequest($"Job status {jobStatus.JobStatusId} not deleted. Something went wrong.");
+                    _context.JobStatuses.Remove(jobStatus);
+                    if (_context.SaveChanges() > 0)
+                    {
+                        return Ok($"Job status {jobStatus.JobStatusId} deleted successfully");
+                    }
+                    else
+                    {
+                        return BadRequest($"Job status {jobStatus.JobStatusId} not deleted. Something went wrong.");
+                    }
                 }
             }
+            catch (Exception ex)
+            {
+                return HandleError(ex);
+            }
+            
         }
     }
 }
