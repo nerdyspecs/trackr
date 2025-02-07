@@ -152,7 +152,7 @@ namespace trackr_api.Controllers
 
         [HttpPatch("{vehicle_id}")]
         [ServiceFilter(typeof(AuthFilter))]
-        public IActionResult UpdateVehicle(int vehicle_id, [FromBody] Vehicle updated_vehicle)
+        public IActionResult UpdateVehicle( int vehicle_id, [FromBody] Vehicle updated_vehicle)
         {
             try
             {
